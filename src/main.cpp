@@ -2,16 +2,19 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-struct Group{
-  bool root;
-}
+
+
 
 struct DataBlock{
   DataBlock *inode;
-  Group g;
-  uint8_t data[512 - sizeof(Group) - sizeof(DataBlock *)];
+  union{
+    uint8_t group; //should only be read at the head
+    uint8_t data[512 - sizeof(group) - sizeof(inode)];
+  }
 
-  void 
+  void fill_block(FILE *f, ){
+    
+  }
 
 }
 
