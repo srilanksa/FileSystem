@@ -59,9 +59,18 @@ fill_data_into_data_blocks(
 
 	current->head |= HEAD_DATA_FLAG;
 
-	char c = 0;
+	int c = 0;
 	
 	//fgetc() returns an int and EOF is -1
+	int i = 0;
+	while(c = fgetc(fd) != EOF) {
+		current->data[i] = (u8) c;
+		i++;
+		if(i >= ARR_SIZE(current->data)){
+			DataBlock *tmp = current;
+			current = find_empty_data_block(arr, db_n);
+		}
+	}
 
 	fclose(fd);
 }
@@ -72,8 +81,9 @@ fill_data_into_data_blocks(
 int main(int argc, char **argv){
 
 	DataBlock db[10]={0};
-	
-	fill_data_into_blocks(argv[1], db, ARR_SIZE(db));
+	DataBlock *ptr=db;
+
+	printf("%d\n",ARR_SIZE(ptr->data));
 	
 
   return 0;
