@@ -8,8 +8,9 @@
 #define HEAD_DATA_FLAG 0b00000001
 #define HEAD_PERM_FLAG 0b00000010
 
-typedef u8 uint8_t;
+typedef uint8_t u8;
 
+struct DataBlock{
 /*
 	head flags
 	0b0000_0000
@@ -19,14 +20,28 @@ struct
 DataBlock
 {
   DataBlock *inode;
+  union{
+    uint8_t group; //should only be read at the head
+    uint8_t data[512 - sizeof(group) - sizeof(inode)];
+  }
 	u8 head; //should only be read at the head
 	u8 data[512 - sizeof(head) - sizeof(inode)];
 };
 
+int get_filled_blocks(DataBlock *arr, int n){
+	int ret = 0;
+	for(int i = 0; i < n; i++){
+		if((arr+i)->head & HEAD_DATA_FLAG > 0){
+			ret++;
+		}
+	}
+	return ret;
+}
+
 DataBlock *find_empty_data_block(DataBlock *arr, int n){
 	DataBlock *ret = NULL;
 	for(int i = 0; i<n; i++){
-		if(((arr+i)->head && HEAD_DATA_FLAG) != 0){
+		if(((arr+i)->head & HEAD_DATA_FLAG) != 0){
 			ret = arr+i;
 			break;
 		}
@@ -36,24 +51,52 @@ DataBlock *find_empty_data_block(DataBlock *arr, int n){
 
 void
 fill_data_into_data_blocks(
-		u8 *data, int data_n, DataBlock *arr, int db_n
+		char *filename,DataBlock *arr, int db_n
 		){
-	
-	static u8 *d_ptr=NULL;
 
+	FILE *fd = fopen(filename,"rb");
+
+	DataBlock *current=find_empty_data_block(arr, db_n);
+	if(current  == NULL) {
+		puts("FAILED, NO DATABLOCKS AVAILABLE"); return;
+	}
+
+  void fill_block(FILE *f, ){
+
+  }
+
+	current->head |= HEAD_DATA_FLAG;
+
+	int c = 0;
+
+	//fgetc() returns an int and EOF is -1
+	int i = 0;
+	while(c = fgetc(fd) != EOF) {
+		current->data[i] = (u8) c;
+		i++;
+		if(i >= ARR_SIZE(current->data)){
+			DataBlock *tmp = current;
+			current = find_empty_data_block(arr, db_n);
+		}
+	}
+
+	fclose(fd);
 }
 
 
 
-
 int main(){
-  
-  DataBlock db[10]={0};
-	
-	printf("sizeof db = %ld, %lx\n",sizeof(db), sizeof(db));
 
-	u8 buffer[sizeof(db[0] - sizeof(DataBlock *) - sizeof(u8))]={0};
-	
+  DataBlock db[10];
+
+
+int main(int argc, char **argv){
+
+	DataBlock db[10]={0};
+	DataBlock *ptr=db;
+
+	printf("%d\n",ARR_SIZE(ptr->data));
+
 
   return 0;
 }
