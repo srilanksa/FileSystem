@@ -14,81 +14,89 @@ typedef uint8_t u8;
 	head flags
 	0b0000_0000
 				    >theres data present to be read from
-*/	
-struct 
-DataBlock
+*/
+struct DataBlock
 {
   DataBlock *inode;
-	u8 head; //should only be read at the head
-	u8 data[512 - sizeof(head) - sizeof(inode)];
+  u8 head;			//should only be read at the head
+  u8 data[512 - sizeof (head) - sizeof (inode)];
 };
 
-int get_filled_blocks(DataBlock *arr, int n){
-	int ret = 0;
-	for(int i = 0; i < n; i++){
-		if(((arr+i)->head & HEAD_DATA_FLAG) > 0){
-			ret++;
-		}
-	}
-	return ret;
+int
+get_filled_blocks (DataBlock * arr, int n)
+{
+  int ret = 0;
+  for (int i = 0; i < n; i++)
+  {
+    if (((arr + i)->head & HEAD_DATA_FLAG) > 0)
+    {
+      ret++;
+    }
+  }
+  return ret;
 }
 
-DataBlock *find_empty_data_block(DataBlock *arr, int n){
-	DataBlock *ret = NULL;
-	for(int i = 0; i<n; i++){
-		if(((arr+i)->head & HEAD_DATA_FLAG) != 0){
-			ret = arr+i;
-			break;
-		}
-	}
-	return ret;
+DataBlock *
+find_empty_data_block (DataBlock * arr, int n)
+{
+  DataBlock *ret = NULL;
+  for (int i = 0; i < n; i++)
+  {
+    if (((arr + i)->head & HEAD_DATA_FLAG) != 0)
+    {
+      ret = arr + i;
+      break;
+    }
+  }
+  return ret;
 }
 
 void
-fill_data_into_data_blocks(
-		char *filename,DataBlock *arr, int db_n
-		){
+fill_data_into_data_blocks (char *filename, DataBlock * arr, int db_n)
+{
 
-	FILE *fd = fopen(filename,"rb");
+  FILE *fd = fopen (filename, "rb");
 
-	DataBlock *current=find_empty_data_block(arr, db_n);
-	if(current  == NULL) {
-		puts("FAILED, NO DATABLOCKS AVAILABLE"); return;
-	}
+  DataBlock *current = find_empty_data_block (arr, db_n);
+  if (current == NULL)
+    {
+      puts ("FAILED, NO DATABLOCKS AVAILABLE");
+      return;
+    }
 
-	current->head |= HEAD_DATA_FLAG;
+  current->head |= HEAD_DATA_FLAG;
 
-	int c = 0;
+  int c = 0;
 
-	//fgetc() returns an int and EOF is -1
-	int i = 0;
-	while((c = fgetc(fd)) != EOF) {
-		current->data[i] = (u8) c;
-		i++;
-		if(i >= ARR_SIZE(current->data)){
-			DataBlock *tmp = current;
-			current = find_empty_data_block(arr, db_n);
-		}
-	}
+  //fgetc() returns an int and EOF is -1
+  int i = 0;
+  while ((c = fgetc (fd)) != EOF)
+  {
+    current->data[i] = (u8) c;
+    i++;
+    if (i >= ARR_SIZE (current->data))
+    {
+      DataBlock *tmp = current;
+      current = find_empty_data_block (arr, db_n);
+    }
+  }
 
-	fclose(fd);
+  fclose (fd);
 }
 
 
 
-int main(int argc, char **argv){
+int
+main (int argc, char **argv)
+{
 
 
-	DataBlock db[10]={0};
-	DataBlock *ptr=db;
+  DataBlock db[10] = { 0 };
+  DataBlock *ptr = db;
 
-	printf("%d\n",ARR_SIZE(ptr->data));
-  
-  fill_data_into_data_blocks(
-    argv[1],
-    db,
-    ARR_SIZE(db)
-  );
+  printf ("%d\n", ARR_SIZE (ptr->data));
+
+  fill_data_into_data_blocks (argv[1], db, ARR_SIZE (db));
 
 
   return 0;
