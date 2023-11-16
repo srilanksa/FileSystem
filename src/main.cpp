@@ -10,7 +10,6 @@
 
 typedef uint8_t u8;
 
-struct DataBlock{
 /*
 	head flags
 	0b0000_0000
@@ -20,10 +19,6 @@ struct
 DataBlock
 {
   DataBlock *inode;
-  union{
-    uint8_t group; //should only be read at the head
-    uint8_t data[512 - sizeof(group) - sizeof(inode)];
-  }
 	u8 head; //should only be read at the head
 	u8 data[512 - sizeof(head) - sizeof(inode)];
 };
@@ -31,7 +26,7 @@ DataBlock
 int get_filled_blocks(DataBlock *arr, int n){
 	int ret = 0;
 	for(int i = 0; i < n; i++){
-		if((arr+i)->head & HEAD_DATA_FLAG > 0){
+		if(((arr+i)->head & HEAD_DATA_FLAG) > 0){
 			ret++;
 		}
 	}
@@ -61,17 +56,13 @@ fill_data_into_data_blocks(
 		puts("FAILED, NO DATABLOCKS AVAILABLE"); return;
 	}
 
-  void fill_block(FILE *f, ){
-
-  }
-
 	current->head |= HEAD_DATA_FLAG;
 
 	int c = 0;
 
 	//fgetc() returns an int and EOF is -1
 	int i = 0;
-	while(c = fgetc(fd) != EOF) {
+	while((c = fgetc(fd)) != EOF) {
 		current->data[i] = (u8) c;
 		i++;
 		if(i >= ARR_SIZE(current->data)){
@@ -85,17 +76,19 @@ fill_data_into_data_blocks(
 
 
 
-int main(){
-
-  DataBlock db[10];
-
-
 int main(int argc, char **argv){
+
 
 	DataBlock db[10]={0};
 	DataBlock *ptr=db;
 
 	printf("%d\n",ARR_SIZE(ptr->data));
+  
+  fill_data_into_data_blocks(
+    argv[1],
+    db,
+    ARR_SIZE(db)
+  );
 
 
   return 0;
