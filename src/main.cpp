@@ -42,7 +42,7 @@ find_empty_data_block (DataBlock * arr, int n)
   DataBlock *ret = NULL;
   for (int i = 0; i < n; i++)
   {
-    if (((arr + i)->head & HEAD_DATA_FLAG) != 0)
+    if (((arr + i)->head & HEAD_DATA_FLAG) == 0)
     {
       ret = arr + i;
       break;
