@@ -21,7 +21,7 @@ struct DataBlock
   u8 head;			//should only be read at the head
   u8 data[512 - sizeof (head) - sizeof (inode)];
 };
-
+	
 int
 get_filled_blocks (DataBlock * arr, int n)
 {
@@ -76,15 +76,22 @@ fill_data_into_data_blocks (char *filename, DataBlock * arr, int db_n)
     i++;
     if (i >= ARR_SIZE (current->data))
     {
+			puts("ALLOCATING ANOTHER DATA BLOCK");
       DataBlock *tmp = current;
       current = find_empty_data_block (arr, db_n);
+			if(current == NULL) 
+			{
+				puts("ERROR, NO MORE MEMORY, ABORTING");
+				return;
+			}
+
+			current->head |= HEAD_DATA_FLAG;
+			i=0;
     }
   }
 
   fclose (fd);
 }
-
-
 
 int
 main (int argc, char **argv)
@@ -94,10 +101,10 @@ main (int argc, char **argv)
   DataBlock db[10] = { 0 };
   DataBlock *ptr = db;
 
-  printf ("%d\n", ARR_SIZE (ptr->data));
+  printf ("%lu\n", ARR_SIZE (ptr->data));
 
   fill_data_into_data_blocks (argv[1], db, ARR_SIZE (db));
-
+	printf("%d\n",get_filled_blocks(db, ARR_SIZE(db)));
 
   return 0;
 }
