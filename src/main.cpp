@@ -94,7 +94,7 @@ fill_data_into_data_blocks (char *filename, DataBlock * arr, int db_n)
 }
 
 void 
-print_file(DataBlock *in)
+cat(DataBlock *in)
 {
 	int i = 0;
 	int size = ARR_SIZE(in->data);
