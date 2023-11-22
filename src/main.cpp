@@ -84,13 +84,41 @@ fill_data_into_data_blocks (char *filename, DataBlock * arr, int db_n)
 				puts("ERROR, NO MORE MEMORY, ABORTING");
 				return;
 			}
-
+			tmp->inode = current;
 			current->head |= HEAD_DATA_FLAG;
 			i=0;
     }
   }
 
   fclose (fd);
+}
+
+void 
+print_file(DataBlock *in)
+{
+	int i = 0;
+	int size = ARR_SIZE(in->data);
+	bool theres_next = (in->inode != NULL) ? true : false;
+
+	printf("inode = %p\n", in->inode);
+
+	printf("theres next = %d\n", theres_next);
+	printf("size = %d\n", size);
+	DataBlock *current = in;
+
+
+	while(true)
+	{
+		printf("%c", current->data[i++]);
+		if (i >= size )
+		{
+			i = 0;
+			current = in->inode;
+		}
+		else if ( i >= size && theres_next)
+			break;
+	}
+
 }
 
 int
@@ -105,6 +133,8 @@ main (int argc, char **argv)
 
   fill_data_into_data_blocks (argv[1], db, ARR_SIZE (db));
 	printf("%d\n",get_filled_blocks(db, ARR_SIZE(db)));
+	print_file(db);
+
 
   return 0;
 }
