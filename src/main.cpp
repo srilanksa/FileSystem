@@ -94,28 +94,27 @@ fill_data_into_data_blocks (char *filename, DataBlock * arr, int db_n)
 }
 
 void 
-cat(DataBlock *in)
+cat(DataBlock *start)
 {
 	int i = 0;
-	int size = ARR_SIZE(in->data);
-	bool theres_next = (in->inode != NULL) ? true : false;
+	int size = ARR_SIZE(start->data);
 
-	printf("inode = %p\n", in->inode);
-
-	printf("theres next = %d\n", theres_next);
+	printf("inode = %p\n", start->inode);
 	printf("size = %d\n", size);
-	DataBlock *current = in;
+	DataBlock *current = start;
 
 
 	while(true)
 	{
 		printf("%c", current->data[i++]);
-		if (i >= size )
+		if ( i >= size )
 		{
 			i = 0;
-			current = in->inode;
+			current = current->inode;
+			if (current->inode == NULL || current->data[i] == 0)
+				break;
 		}
-		else if ( i >= size && theres_next)
+		else if ( current->data[i] == 0)
 			break;
 	}
 
