@@ -133,7 +133,7 @@ main (int argc, char **argv)
 
   fill_data_into_data_blocks (argv[1], db, ARR_SIZE (db));
 	printf("%d\n",get_filled_blocks(db, ARR_SIZE(db)));
-	print_file(db);
+	cat(db);
 
 
   return 0;
