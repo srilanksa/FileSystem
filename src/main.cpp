@@ -120,6 +120,29 @@ cat(DataBlock *start)
 
 }
 
+void 
+rm(DataBlock *start)
+{
+	int i = 0;
+	int size = ARR_SIZE(start->data);
+	DataBlock *current = start;
+	
+	while (true) 
+	{
+		memset(current, 0, size);
+		DataBlock *tmp = current;
+		if(current->inode != NULL)
+		{
+			current = current->inode;
+			tmp->inode = NULL;
+			tmp->head = 0;
+		}
+		else	break;
+	}
+
+}
+
+
 int
 main (int argc, char **argv)
 {
@@ -133,6 +156,15 @@ main (int argc, char **argv)
   fill_data_into_data_blocks (argv[1], db, ARR_SIZE (db));
 	printf("%d\n",get_filled_blocks(db, ARR_SIZE(db)));
 	cat(db);
+	rm(db);
+	
+	char *byte = (char *) db;
+	for(int i = 0; i < ARR_SIZE(db); i++)
+	{
+		printf("%c", *(byte+i));
+	}
+
+	puts("end");
 
 
   return 0;
